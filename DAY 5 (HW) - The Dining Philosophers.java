@@ -2,8 +2,8 @@ import java.util.concurrent.Semaphore;
 
 class DiningPhilosophers {
 
-    private Semaphore[] forks = new Semaphore[5];
-    private Semaphore room = new Semaphore(4);
+    private final Semaphore[] forks = new Semaphore[5];
+    private final Semaphore eatingLimiter = new Semaphore(4); // at most 4 can try to eat
 
     public DiningPhilosophers() {
         for (int i = 0; i < 5; i++) {
@@ -11,33 +11,28 @@ class DiningPhilosophers {
         }
     }
 
-    public void wantsToEat(
-            int philosopher,
-            Runnable pickLeftFork,
-            Runnable pickRightFork,
-            Runnable eat,
-            Runnable putLeftFork,
-            Runnable putRightFork) throws InterruptedException {
+    public void wantsToEat(int philosopher,
+                           Runnable pickLeftFork,
+                           Runnable pickRightFork,
+                           Runnable eat,
+                           Runnable putLeftFork,
+                           Runnable putRightFork) throws InterruptedException {
 
         int left = philosopher;
-        int right = (philosopher + 1) % 5;
+        int right = (philosopher + 4) % 5; // (philosopher - 1 + 5) % 5
 
-        room.acquire();
-
+        eatingLimiter.acquire();       // limit concurrent eaters to 4
         forks[left].acquire();
         forks[right].acquire();
 
         pickLeftFork.run();
         pickRightFork.run();
-
         eat.run();
-
-        putRightFork.run();
-        forks[right].release();
-
         putLeftFork.run();
-        forks[left].release();
+        putRightFork.run();
 
-        room.release();
+        forks[left].release();
+        forks[right].release();
+        eatingLimiter.release();
     }
 }
