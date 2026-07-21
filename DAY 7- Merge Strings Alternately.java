@@ -1,26 +1,20 @@
 class Solution {
-    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        ListNode dummy = new ListNode(0);
-        ListNode current = dummy;
-        int carry = 0;
-
-        while (l1 != null || l2 != null || carry != 0) {
-            int sum = carry;
-
-            if (l1 != null) {
-                sum += l1.val;
-                l1 = l1.next;
+    public String mergeAlternately(String word1, String word2) {
+        StringBuilder sb = new StringBuilder();
+        int i = 0, j = 0;
+        int n1 = word1.length(), n2 = word2.length();
+        
+        while (i < n1 || j < n2) {
+            if (i < n1) {
+                sb.append(word1.charAt(i));
+                i++;
             }
-
-            if (l2 != null) {
-                sum += l2.val;
-                l2 = l2.next;
+            if (j < n2) {
+                sb.append(word2.charAt(j));
+                j++;
             }
-             carry = sum / 10;
-            current.next = new ListNode(sum % 10);
-            current = current.next;
         }
-
-        return dummy.next;
+        
+        return sb.toString();
     }
 }
